@@ -28,7 +28,7 @@ ds = ds[:, shuffle(1:end)];
 W = rand(2,2);
 A = ones(2,2);
 relu(x) = x .* Float64.(x .> 0);
-drelu(x) = Float64.(x .> 0);
+drelu(x) = Float64.(x .> 0)
 
 # Learning
 for epoch in 1:100
@@ -36,10 +36,10 @@ for epoch in 1:100
         d = e[1:2]
         t = e[3:4]
         λ = A * t
-        e = t - W * d
+        e = d - W * t
         ε = λ .* e
         δ = 0.5 * (1 ./ λ - e .^ 2)
-        global W += ηa * ε * d'
+        global W += ηa * ε * t'
         global A += ηw * A .* (δ * t')
     end
 end
@@ -52,8 +52,9 @@ for e in eachcol(ds)
     for i in 1:T
         λ = A * relu(t)
         e = d - W * relu(t)
+        ε = λ .* e
         δ = 0.5 * (1 ./ λ - e .^ 2)
-        a = drelu(t) .* (A' * δ)
+        a = drelu(t) .* (W' * ε + A' * δ)
         t += 1/τ * (-t+a)
     end
     append!(cs, argmax(t))
